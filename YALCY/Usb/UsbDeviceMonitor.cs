@@ -25,7 +25,7 @@ public class UsbDeviceMonitor
     private static List<SerialDevice> _connectedSerialDevices = new();
     private static List<BleDevice> _connectedBLEDevices = new();
 
-    private static List<int> _connectedControllerIndices = new(); // Store connected XInput controller indices
+    //private static List<int> _connectedControllerIndices = new(); // Store connected XInput controller indices
 
     public static Action<Device> DeviceInserted;
     public static Action<Device> DeviceRemoved;
