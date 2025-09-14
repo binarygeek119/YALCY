@@ -145,10 +145,10 @@ public class UsbDeviceMonitor
     {
         OnStageKitCommand?.Invoke(commandId, parameter);
 
-        foreach (var controllerIndex in _connectedControllerIndices) // Only vibrate connected controllers
+       /* foreach (var controllerIndex in _connectedControllerIndices) // Only vibrate connected controllers
         {
-           // SetXInputVibration(controllerIndex, parameter, (byte)commandId);
-        }
+            SetXInputVibration(controllerIndex, parameter, (byte)commandId);
+        }*/
 
         foreach (var device in _connectedHidDevices)
         {
