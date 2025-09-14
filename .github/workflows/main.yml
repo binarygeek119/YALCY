@@ -4,36 +4,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: ./YALCY
-
-      - name: Build
-        run: dotnet build --configuration Release
-        working-directory: ./YALCY
-
-      - name: Publish
-        run: dotnet publish -c Release -r win-x64 --self-contained=true --output ./publish
-        working-directory: ./YALCY
-
-      - name: Upload Windows Binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-binaries
-          path: ./YALCY/publish
-
   build-linux:
     runs-on: ubuntu-latest
 
@@ -62,36 +32,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-binaries
-          path: ./YALCY/publish
-
-  build-macos:
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Restore dependencies
-        run: dotnet restore
-        working-directory: ./YALCY
-
-      - name: Build
-        run: dotnet build --configuration Release
-        working-directory: ./YALCY
-
-      - name: Publish
-        run: dotnet publish -c Release -r osx-x64 --self-contained=true --output ./publish
-        working-directory: ./YALCY
-
-      - name: Upload macOS Binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-binaries
           path: ./YALCY/publish
 
   release:
@@ -136,9 +76,6 @@ jobs:
       - name: Debug Print upload URL from create-release
         run: echo "Upload URL ${{ steps.create_release.outputs.upload_url }}"
 
-      - name: Save upload URL for macOS release
-        run: echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
-
       - name: Debug Print upload_url.txt contents
         run: cat upload_url.txt || echo "upload_url.txt is missing or empty!"
 
@@ -148,37 +85,16 @@ jobs:
           name: upload-url
           path: upload_url.txt
 
-      - name: Download Windows Binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-binaries
-          path: ./windows
-
-      - name: Download Linux Binaries
+     - name: Download Linux Binaries
         uses: actions/download-artifact@v4
         with:
           name: linux-binaries
           path: ./linux
 
-      - name: Zip Windows Binaries
-        run: |
-          cd ./windows
-          zip -r ../windows-x64-binaries.zip .
-
       - name: Create Tarball for Linux Binaries
         run: |
           cd ./linux
           tar -czvf ../linux-x64-binaries.tar.gz .
-
-      - name: Upload Windows Binaries to Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./windows-x64-binaries.zip
-          asset_name: windows-x64-binaries.zip
-          asset_content_type: application/zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           
       - name: Upload Linux Binaries to Release
         uses: actions/upload-release-asset@v1
@@ -187,49 +103,5 @@ jobs:
           asset_path: ./linux-x64-binaries.tar.gz
           asset_name: linux-x64-binaries.tar.gz
           asset_content_type: application/gzip
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-
-  create-dmg:
-    runs-on: macos-latest
-    needs: release
-
-    steps:
-      - name: Download macOS Binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-binaries
-          path: ./macos
-     
-      - name: Download upload URL
-        uses: actions/download-artifact@v4
-        with:
-          name: upload-url
-          path: .
-
-      - name: Debug List files in workspace
-        run: ls -la
-
-      - name: Debug Print upload_url.txt
-        run: cat upload_url.txt || echo "upload_url.txt is missing or empty"
-
-      - name: Read upload URL
-        run: echo "UPLOAD_URL=$(cat upload_url.txt)" >> $GITHUB_ENV
-
-      - name: Debug Show stored UPLOAD_URL
-        run: echo "UPLOAD_URL=${{ env.UPLOAD_URL }}"
-        
-      - name: Create DMG for macOS Binaries
-        run: |
-          hdiutil create -volname YALCY -srcfolder ./macos -ov -format UDZO ./macos-x64-binaries.dmg
-
-      - name: Upload macOS DMG to Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: ./macos-x64-binaries.dmg
-          asset_name: macos-x64-binaries.dmg
-          asset_content_type: application/x-apple-diskimage
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
