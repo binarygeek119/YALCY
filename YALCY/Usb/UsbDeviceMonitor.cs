@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -25,7 +25,7 @@ public class UsbDeviceMonitor
     private static List<SerialDevice> _connectedSerialDevices = new();
     private static List<BleDevice> _connectedBLEDevices = new();
 
-    private static List<int> _connectedControllerIndices = new(); // Store connected XInput controller indices
+    //private static List<int> _connectedControllerIndices = new(); // Store connected XInput controller indices
 
     public static Action<Device> DeviceInserted;
     public static Action<Device> DeviceRemoved;
@@ -58,7 +58,7 @@ public class UsbDeviceMonitor
         DeviceInserted -= mainViewModel.OnDeviceInserted;
         DeviceRemoved -= mainViewModel.OnDeviceRemoved;
         _connectedHidDevices.Clear();
-        _connectedControllerIndices.Clear(); // Clear XInput controllers
+        //_connectedControllerIndices.Clear(); // Clear XInput controllers
     }
 
     private void OnDeviceListChanged()
@@ -136,7 +136,7 @@ public class UsbDeviceMonitor
             _perviousSerialDevices = newSerialDevices;
             _perviousBLEDevices = newBleDevices;
 
-            UpdateConnectedXInputControllers();
+           // UpdateConnectedXInputControllers();
 
         });
     }
@@ -147,7 +147,7 @@ public class UsbDeviceMonitor
 
         foreach (var controllerIndex in _connectedControllerIndices) // Only vibrate connected controllers
         {
-            SetXInputVibration(controllerIndex, parameter, (byte)commandId);
+           // SetXInputVibration(controllerIndex, parameter, (byte)commandId);
         }
 
         foreach (var device in _connectedHidDevices)
@@ -168,7 +168,7 @@ public class UsbDeviceMonitor
         }
     }
 
-    private void UpdateConnectedXInputControllers()
+   /* private void UpdateConnectedXInputControllers()
     {
         _connectedControllerIndices.Clear();
 
@@ -194,12 +194,12 @@ public class UsbDeviceMonitor
         XInputSetState(controllerIndex, ref vibration);
     }
 
-    /*[DllImport("XInput1_4.dll", EntryPoint = "XInputSetState")]
+    [DllImport("XInput1_4.dll", EntryPoint = "XInputSetState")]
     private static extern int XInputSetState(int dwUserIndex, ref XINPUT_VIBRATION pVibration);
 
     [DllImport("XInput1_4.dll", EntryPoint = "XInputGetState")]
     private static extern int XInputGetState(int dwUserIndex, ref XINPUT_STATE pState);
-*/
+
     [StructLayout(LayoutKind.Sequential)]
     private struct XINPUT_STATE
     {
@@ -224,5 +224,5 @@ public class UsbDeviceMonitor
     {
         public ushort wLeftMotorSpeed;
         public ushort wRightMotorSpeed;
-    }
+    }*/
 }
