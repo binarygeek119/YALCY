@@ -1,4 +1,4 @@
-name: Build All Platforms
+name: Build Linux Only
 
 on:
   workflow_dispatch:
@@ -65,27 +65,13 @@ jobs:
           body: |
             Automatically generated release.
             Includes:
-            - Windows x64 binaries
             - Linux x64 binaries
-            - macOS x64 binaries
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Debug Print upload URL from create-release
-        run: echo "Upload URL ${{ steps.create_release.outputs.upload_url }}"
-
-      - name: Debug Print upload_url.txt contents
-        run: cat upload_url.txt || echo "upload_url.txt is missing or empty!"
-
-      - name: Upload upload URL
-        uses: actions/upload-artifact@v4
-        with:
-          name: upload-url
-          path: upload_url.txt
-
-     - name: Download Linux Binaries
+      - name: Download Linux Binaries
         uses: actions/download-artifact@v4
         with:
           name: linux-binaries
@@ -95,7 +81,7 @@ jobs:
         run: |
           cd ./linux
           tar -czvf ../linux-x64-binaries.tar.gz .
-          
+
       - name: Upload Linux Binaries to Release
         uses: actions/upload-release-asset@v1
         with:
