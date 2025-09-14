@@ -194,12 +194,12 @@ public class UsbDeviceMonitor
         XInputSetState(controllerIndex, ref vibration);
     }
 
-    [DllImport("XInput1_4.dll", EntryPoint = "XInputSetState")]
+    /*[DllImport("XInput1_4.dll", EntryPoint = "XInputSetState")]
     private static extern int XInputSetState(int dwUserIndex, ref XINPUT_VIBRATION pVibration);
 
     [DllImport("XInput1_4.dll", EntryPoint = "XInputGetState")]
     private static extern int XInputGetState(int dwUserIndex, ref XINPUT_STATE pState);
-
+*/
     [StructLayout(LayoutKind.Sequential)]
     private struct XINPUT_STATE
     {
